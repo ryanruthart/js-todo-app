@@ -11,5 +11,8 @@ router.get('/', userController.home)
 // register post request
 router.post('/register', userController.register)
 
+// user sign in
+router.post('/login', userController.login)
+
 // export the router
 module.exports = router
