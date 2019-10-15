@@ -1,0 +1,23 @@
+{
+  "name": "js-todo-app",
+  "version": "1.0.0",
+  "description": "JavaScript, NodeJS and MongoDB todo app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryanruthart/js-todo-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ryanruthart/js-todo-app/issues"
+  },
+  "homepage": "https://github.com/ryanruthart/js-todo-app#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
