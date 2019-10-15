@@ -2,18 +2,14 @@
 const express = require('express')
 // make a reference to routers
 const router = express.Router()
-
+//import the user controller
+const userController = require('./controllers/userController')
 
 // root page
-router.get('/', function(req, res) {
-  res.render('home-guest')
-})
+router.get('/', userController.home)
 
-
-// about
-router.get('/about', function(req, res) {
-  res.send("TEST")
-})
+// register post request
+router.post('/register', userController.register)
 
 // export the router
 module.exports = router

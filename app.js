@@ -4,6 +4,12 @@ const app = express()
 
 const router = require('./router')
 
+// set up express to pass form values
+app.use(express.urlencoded({extended: false}))
+// tell app to accept json data
+app.use(express.json())
+
+
 // Set the app to serve our public folder
 app.use(express.static('public'))
 
