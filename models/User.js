@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs')
 const usersCollection = require('../db').collection('users')
 const validator = require("validator")
 
@@ -14,7 +15,7 @@ User.prototype.validate = function() {
   if (!validator.isEmail(this.data.email)) {this.errors.push("You must provide a valid email address")}
   if (this.data.password == "") {this.errors.push("You must provide a valid password")}
   if (this.data.password.length > 0 && this.data.password.length < 12) {this.errors.push("Your password must be at least than 12 characters")}
-  if (this.data.password.length > 400) {this.errors.push("Your password is too long")}
+  if (this.data.password.length > 50) {this.errors.push("Your password is too long, 50 character maximum")}
   if (this.data.username.length > 0 && this.data.username.length < 3) {this.errors.push("Your username must be at least than 3 characters")}
   if (this.data.username.length > 30) {this.errors.push("Your username is too long")}
 
@@ -40,20 +41,33 @@ User.prototype.register = function() {
   this.validate()
   // Only if validation passes then save user data into database
   if (!this.errors.length) {
+    // hash user password
+    let salt = bcrypt.genSaltSync(10)
+    this.data.password = bcrypt.hashSync(this.data.password, salt)
     usersCollection.insertOne(this.data)
   }
 
 }
 
-User.prototype.login = function (callback) {
-  this.cleanUp()
-  usersCollection.findOne({username: this.data.username}, (err, attemptedUser) => {
-    if (attemptedUser && attemptedUser.password == this.data.password) {
-      callback("congrats")
-    } else {
-      callback('Invalid username / password!!!!!!!!')
-    }
-  })
+User.prototype.login = function() {
+
+  return new Promise((resolve, reject) => {
+    this.cleanUp()
+
+    usersCollection.findOne({username: this.data.username}).then((attemptedUser) => {
+      if (attemptedUser && bcrypt.compareSync(this.data.password, attemptedUser.password)) {
+        resolve("congrats")
+      } else {
+        reject('Invalid username / password!!!!!!!!')
+      }
+
+    }).catch(function () {
+      reject("Please try again later")
+    })
+
+    })
+
+
 }
 
 

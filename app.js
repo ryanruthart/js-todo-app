@@ -1,6 +1,12 @@
 // Initialize the express serving library
 const express = require('express')
+
+// express sessiosn library for login things
+const session = require('express-session')
+
+// initizlie the app
 const app = express()
+
 
 const router = require('./router')
 
