@@ -7,6 +7,9 @@ const session = require('express-session')
 // mongo package to save sessions to database
 const MongoStore = require('connect-mongo')(session)
 
+// flash messaging package
+const flash = require('connect-flash')
+
 // initizlie the app
 const app = express()
 
@@ -21,6 +24,8 @@ let sessionOptions = session({
 })
 
 app.use(sessionOptions)
+
+app.use(flash())
 
 const router = require('./router')
 
