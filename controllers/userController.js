@@ -5,16 +5,20 @@ exports.login = function (req, res) {
   user.login().then(function(result) {
     // add a user to the session after log in success
     req.session.user = {username: user.data.username}
-    res.send(result)
+    req.session.save(function() {
+      res.redirect('/')
+    })
   }).catch(function(e) {
     res.send(e)
   })
 
 }
 
-exports.logout = function () {
-
-
+exports.logout = function(req, res) {
+  req.session.destroy(function() {
+    res.redirect('/')
+  })
+  
 }
 
 
