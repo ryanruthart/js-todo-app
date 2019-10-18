@@ -4,9 +4,28 @@ const express = require('express')
 // express sessiosn library for login things
 const session = require('express-session')
 
+// mongo package to save sessions to database
+const MongoStore = require('connect-mongo')(session)
+
+// flash messaging package
+const flash = require('connect-flash')
+
 // initizlie the app
 const app = express()
 
+// set up the session options
+let sessionOptions = session({
+    secret: "Secret key is hard to guess when you do this!@#$fa$%Gaf211",
+    store: new MongoStore({client: require('./db')}),
+    resave: false,
+    saveUninitialized: false,
+    cookie: {maxAge: 1000 * 60 * 60 * 24,
+    httpOnly: true}
+})
+
+app.use(sessionOptions)
+
+app.use(flash())
 
 const router = require('./router')
 
