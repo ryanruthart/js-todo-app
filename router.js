@@ -20,6 +20,12 @@ router.post('/login', userController.login)
 // user logout
 router.post('/logout', userController.logout)
 
+/////////////////
+// profile related routes
+
+router.get('/profile/:username', userController.ifUserExists, userController.profilePostsScreen)
+
+
 
 //////////////
 // POSTS
