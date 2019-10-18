@@ -4,6 +4,9 @@ const express = require('express')
 const router = express.Router()
 //import the user controller
 const userController = require('./controllers/userController')
+//import the post controller
+const postController = require('./controllers/postController')
+
 
 // root page
 router.get('/', userController.home)
@@ -17,6 +20,8 @@ router.post('/login', userController.login)
 // user logout
 router.post('/logout', userController.logout)
 
+// create post
+router.get('/create-post', userController.mustBeLoggedIn, postController.viewCreateScreen)
 
 // export the router
 module.exports = router

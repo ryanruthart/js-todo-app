@@ -54,7 +54,16 @@ exports.home = function (req, res) {
   } else {
     res.render('home-guest', {errors: req.flash('errors'), regErrors: req.flash('regErrors')})
   }
-
-
-
 }
+
+exports.mustBeLoggedIn = function (req, res, next) {
+  if (req.session.user) {
+    next()
+  } else {
+    req.flash("errors", "You must be logged in to perform that action")
+    req.session.save(function() {
+      res.redirect('/')
+    })
+  }
+}
+
