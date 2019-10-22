@@ -27,6 +27,17 @@ app.use(sessionOptions)
 
 app.use(flash())
 
+// set it up to pass local user data to each session?
+// must be before the router, so it gets the user data before the route is passed
+app.use(function(req, res, next) {
+    // make current user id available on the request object
+    if (req.session.user) {req.visitorId = req.session.user._id} else {req.visitorId = 0}
+
+    // make user sesion data avilable from within view templates
+    res.locals.user = req.session.user
+    next()
+})
+
 const router = require('./router')
 
 // set up express to pass form values
