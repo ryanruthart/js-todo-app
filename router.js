@@ -39,6 +39,11 @@ router.post('/create-post', userController.mustBeLoggedIn, postController.create
 // render a post
 router.get('/post/:id', postController.viewSingle)
 
+// edit a post
+router.get('/post/:id/edit', postController.viewEditScreen)
+
+// edit a post (save changes)
+router.post('/post/:id/edit', postController.edit)
 
 // export the router
 module.exports = router

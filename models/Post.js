@@ -2,10 +2,11 @@ const postsCollection = require('../db').db().collection('posts')
 const ObjectID = require('mongodb').ObjectID
 const User = require('./User')
 
-let Post = function(data, userid) {
+let Post = function(data, userid, requestedPostId) {
   this.data = data
   this.errors = []
   this.userid = userid
+  this.requestedPostId = requestedPostId
 }
 
 Post.prototype.cleanUp = function() {
@@ -44,8 +45,43 @@ Post.prototype.create = function() {
 
 }
 
+Post.prototype.update = function () {
+  return new Promise(async (resolve, reject) => {
+    try {
+      let post = await Post.findSingleById(this.requestedPostId, this.userid)
+      // if 
+      if (post.isVisitorOwner) {
+        // actually update the database
+        let status = await this.actuallyUpdate()
+        resolve(status)
+      } else {
+        reject()
+      }
+    } catch {
+      reject()
+    }
+  })
+}
 
-Post.reuseablePostQuery = function(uniqueOperations) {
+
+Post.prototype.actuallyUpdate = function() {
+  return new Promise(async (resolve, reject) => {
+    this.cleanUp()
+    this.validate()
+    if (!this.errors.length) {
+      // no validation errors, update the entry
+      await postsCollection.findOneAndUpdate({_id: new ObjectID(this.requestedPostId)}, {$set: {
+        title: this.data.title,
+        body: this.data.body
+      }})
+      resolve("success")
+    } else {
+      resolve("failure")
+    }
+  })
+}
+
+Post.reuseablePostQuery = function(uniqueOperations, visitorId) {
   return new Promise(async function(resolve, reject) {
 
     let aggOperations = uniqueOperations.concat([
@@ -54,6 +90,7 @@ Post.reuseablePostQuery = function(uniqueOperations) {
         title:1,
         body: 1,
         createdDate: 1,
+        authorId: "$author",
         author: {$arrayElemAt: ["$authorDocument", 0]}
       }}
     ])
@@ -63,6 +100,9 @@ Post.reuseablePostQuery = function(uniqueOperations) {
 
     // clean up the author property in each post object
     posts = posts.map(function(post) {
+      // check if the post is owned by the current user
+      post.isVisitorOwner = post.authorId.equals(visitorId) 
+
       post.author = {
         username: post.author.username,
         avatar: new User(post.author, true).avatar
@@ -73,7 +113,7 @@ Post.reuseablePostQuery = function(uniqueOperations) {
   })
 }
 
-Post.findSingleById = function(id) {
+Post.findSingleById = function(id, visitorId) {
   return new Promise(async function(resolve, reject) {
     // check id is safe
     if (typeof id != 'string' || !ObjectID.isValid(id)) {
@@ -83,7 +123,7 @@ Post.findSingleById = function(id) {
 
     let posts = await Post.reuseablePostQuery([
       {$match: {_id: new ObjectID(id)}}
-    ])
+    ], visitorId)
 
     if (posts.length) {
       resolve(posts[0])
@@ -101,5 +141,4 @@ Post.findByAuthorId = function (authorId) {
   ])
 }
 
-
-module.exports = Post
+module.exports = Post  
